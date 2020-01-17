@@ -1354,7 +1354,28 @@ public class Character : MonoBehaviour
                 {
                     tongueState = TongueState.RetractingHitFly;
                     ingestingFly = fly.GetComponent<Fly>();
-                    ingestingFly.BeingIngested = true;
+
+                    switch (ingestingFly.type) {
+                        case FlyType.Normal:
+                            ingestingFly.BeingIngested = true;
+                            break;
+
+                        case FlyType.Poison:
+                            IngestedFly = true;
+                            tongueType = TongueType.Poison;
+                            break;
+
+                        case FlyType.Frost:
+                            IngestedFly = true;
+                            tongueType = TongueType.Frost;
+                            break;
+
+                        case FlyType.Shock:
+                            IngestedFly = true;
+                            tongueType = TongueType.Shock;
+                            break;
+                    }
+                    this.characterAnimator.ChangeTongueType(tongueType);
                     SoundController.PlaySoundEffect("TongueCollideSurface", 0.5f, TongueTipPos);
                 }
             }
