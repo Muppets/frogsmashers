@@ -266,7 +266,11 @@ public class CharacterAnimator : MonoBehaviour
     void AnimateRun()
     {
         int frameBefore = frame;
-        RunAnimation(run, 0.04f);
+        if (character.IsFrosted)
+            RunAnimation(run, 0.08f);
+        else
+            RunAnimation(run, 0.04f);
+
         if (frame != frameBefore && frame % 2 == 1)
         {
             FreeLives.SoundController.PlaySoundEffect("Footstep", 0.1f, transform.position);
@@ -431,20 +435,24 @@ public class CharacterAnimator : MonoBehaviour
     void AnimateAttack()
     {
         var ad = DetermineAttackDirection();
+        var attackDelay = 0.05f;
+
+        if (character.IsFrosted)
+            attackDelay = 0.2f;
 
         if (ad == AttackDirection.Up)
-            RunAnimation(attackUp, 0.05f, true);
+            RunAnimation(attackUp, attackDelay, true);
         else if (ad == AttackDirection.DiagonalUp)
         {
-            RunAnimation(attackDiagUp, 0.05f, true);
+            RunAnimation(attackDiagUp, attackDelay, true);
         }
         else if (ad == AttackDirection.Down)
         {
-            RunAnimation(attackDown, 0.05f, true);
+            RunAnimation(attackDown, attackDelay, true);
         }
         else if (ad == AttackDirection.DownForward)
         {
-            RunAnimation(attackDownForward, 0.05f, true);
+            RunAnimation(attackDownForward, attackDelay, true);
         }
         else
             rend.sprite = attack[0];
