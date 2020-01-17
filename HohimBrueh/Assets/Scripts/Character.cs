@@ -9,7 +9,8 @@ public enum CharacterState
     Normal,
     Attacking,
     Bouncing,
-    Tounge
+    Tounge,
+    Shocked
 }
 public enum AttackState
 {
@@ -44,6 +45,7 @@ public class Character : MonoBehaviour
     public Player player;
     [HideInInspector]
     public Player lastHitByPlayer;
+    public TongueType lastHitTongueType;
 
     public CharacterState state;
     public AttackState attackState;
@@ -93,6 +95,8 @@ public class Character : MonoBehaviour
     public float attackChargeTime;
     float attackChargeCounter;
 
+    public GameObject damageText;
+
     [HideInInspector]
     public float gravityGraceTimeLeft;
     public float attackTime;
@@ -141,6 +145,7 @@ public class Character : MonoBehaviour
     public float t { get; protected set; }
 
     float skidRecoverTimeLeft;
+    float shockRecoverTimeLeft;
     [HideInInspector]
     public Vector2 velocity, velocityT;
 
@@ -332,7 +337,6 @@ public class Character : MonoBehaviour
                 dir -= Vector2.up;
 
             GetHit(dir, UnityEngine.Random.value, this);
-
         }
 
         CheckDeath();
@@ -796,6 +800,7 @@ public class Character : MonoBehaviour
             wasHitDownwards = true;
         hasReachedApex = false;
         lastHitByPlayer = attacker.player;
+        lastHitTongueType = attacker.tongueType;
         canBounceDodge = false;
         hasBounceDodged = false;
         canBounceTongue = false;
@@ -879,6 +884,9 @@ public class Character : MonoBehaviour
             hitDir.y = 0.33f;
         hitDir.Normalize();
         float totalPower = 10f + hitsTaken * 10f + power * 30f;
+
+        UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
+        textComponent.text = String.Format("{0}%", (int)totalPower);
 
         skidRecoverTimeLeft = 0.5f;
         velocity = hitDir.normalized * totalPower;
@@ -1006,7 +1014,15 @@ public class Character : MonoBehaviour
             {
                 skidRecoverTimeLeft -= t;
                 if (skidRecoverTimeLeft <= 0f)
+                {
                     StopBouncing();
+                    
+                    if (lastHitTongueType == TongueType.Shock)
+                    {
+                        state = CharacterState.Shocked;
+                        shockRecoverTimeLeft = 2f;
+                    }
+                }
             }
         }
     }
@@ -1051,6 +1067,14 @@ public class Character : MonoBehaviour
                 RunPhysicsBouncing();
             else
                 RunPhysicsNormal();
+        }
+        else if (state == CharacterState.Shocked)
+        {
+            shockRecoverTimeLeft -= t;
+            if (shockRecoverTimeLeft <= 0f)
+            {
+                state = CharacterState.Normal;
+            }
         }
         else
         {
@@ -1125,6 +1149,10 @@ public class Character : MonoBehaviour
         state = CharacterState.Normal;
         wasHitDownwards = false;
         hitsTaken = 0;
+
+        UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
+        textComponent.text = "0%";
+
         lastHitByPlayer = null;
     }
 
