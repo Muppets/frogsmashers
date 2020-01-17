@@ -134,6 +134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   attackState: 0
+  tongueType: 0
   maxRunSpeed: 20
   runAccel: 175
   airAccel: 200
@@ -174,6 +175,8 @@ MonoBehaviour:
   hitsTaken: 0
   attackTimeLeft: 0
   attackRecoverTimeLeft: 0
+  poisonTime: 10
+  poisonMultiplier: 1.5
   attackDir: {x: 0, y: 0}
 --- !u!61 &61092716579564996
 BoxCollider2D:
