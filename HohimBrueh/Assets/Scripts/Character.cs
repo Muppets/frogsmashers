@@ -86,6 +86,8 @@ public class Character : MonoBehaviour
     public float attackChargeTime;
     float attackChargeCounter;
 
+    public GameObject damageText;
+
     [HideInInspector]
     public float gravityGraceTimeLeft;
     public float attackTime;
@@ -323,7 +325,6 @@ public class Character : MonoBehaviour
                 dir -= Vector2.up;
 
             GetHit(dir, UnityEngine.Random.value, this);
-
         }
 
         CheckDeath();
@@ -873,6 +874,9 @@ public class Character : MonoBehaviour
         hitDir.Normalize();
         float totalPower = 10f + hitsTaken * 10f + power * 30f;
 
+        UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
+        textComponent.text = String.Format("{0}%", (int)totalPower);
+
         skidRecoverTimeLeft = 0.5f;
         velocity = hitDir.normalized * totalPower;
         timeSinceHit = 0f;
@@ -1118,6 +1122,10 @@ public class Character : MonoBehaviour
         state = CharacterState.Normal;
         wasHitDownwards = false;
         hitsTaken = 0;
+
+        UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
+        textComponent.text = "0%";
+
         lastHitByPlayer = null;
     }
 
