@@ -29,7 +29,13 @@ public enum TongueState
     HitEnemyTongueStunned,
     HitFlyBurping
 }
-
+public enum TongueType
+{
+    Normal,
+    Poison,
+    Frost,
+    Shock
+}
 public class Character : MonoBehaviour
 {
     [HideInInspector]
@@ -41,6 +47,7 @@ public class Character : MonoBehaviour
 
     public CharacterState state;
     public AttackState attackState;
+    public TongueType tongueType;
 
     public static bool isTeamMode;
 
@@ -804,8 +811,6 @@ public class Character : MonoBehaviour
         SoundController.PlaySoundEffect("TongueCollide", 0.5f, transform.position);
         TimeBump(0.75f, 0f);
         attacker.TimeBump(0.5f, 0f);
-        //TimeController.TimeBumpCharacters(transform.position, hitsTaken, 15f, true);
-        //EffectsController.CreateHitEffect(transform.position + Vector3.up * height * 0.5f, timeBumpTimeLeft);
     }
 
     public void GetHitByBouncingCharacter(Vector2 hitVelocity, Character bouncer, Player attackingPlayer)
@@ -1223,6 +1228,14 @@ public class Character : MonoBehaviour
             }
         }
 
+        if (input.rightShoulder)
+        {
+            if (state == CharacterState.Normal && !input.wasRightShoulder)
+            {
+                SwitchTongue();
+            }
+        }
+
         if (input.aButton && !input.down && (jumpCooldownLeft <= 0f || (!input.wasAButton && state != CharacterState.Attacking)))
         {
             if (onGround || WallSliding)
@@ -1517,5 +1530,26 @@ public class Character : MonoBehaviour
 
     }
 
+    void SwitchTongue()
+    {
+        switch(tongueType)
+        {
+            case TongueType.Normal:
+                tongueType = TongueType.Poison;
+            break;
+
+            case TongueType.Poison:
+                tongueType = TongueType.Frost;
+            break;
+
+            case TongueType.Frost:
+                tongueType = TongueType.Shock;
+            break;
+
+            case TongueType.Shock:
+                tongueType = TongueType.Normal;
+            break;
+        }
+    }
 
 }

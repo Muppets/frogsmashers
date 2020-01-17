@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine;
 
 namespace FreeLives
 {
@@ -20,6 +19,7 @@ namespace FreeLives
         static KeyCode kb1X = KeyCode.Period;
         static KeyCode kb1Y = KeyCode.Slash;
         static KeyCode kb1Start = KeyCode.Return;
+        static KeyCode kb1ShoulderRight = KeyCode.RightControl;
 
         static KeyCode kb2Left = KeyCode.A;
         static KeyCode kb2Right = KeyCode.D;
@@ -30,11 +30,10 @@ namespace FreeLives
         static KeyCode kb2X = KeyCode.U;
         static KeyCode kb2Y = KeyCode.I;
         static KeyCode kb2Start = KeyCode.Space;
+        static KeyCode kb2ShoulderRight = KeyCode.LeftControl;
 
 
         static float deadZone = 0.3f;
-
-//        static InputDevice[] inControlDevices = new InputDevice[4];
 
         static bool haveInitialized;
 
@@ -47,7 +46,6 @@ namespace FreeLives
             else
             {
                 GetKeyboard1Input(inputState);
-                
             }
         }
 
@@ -125,6 +123,7 @@ namespace FreeLives
             inputState.wasUp = inputState.up;
             inputState.wasDown = inputState.down;
             inputState.wasStart = inputState.start;
+            inputState.wasRightShoulder = inputState.rightShoulder;
         }
 
         private static void Initialize()
@@ -132,21 +131,7 @@ namespace FreeLives
             if (haveInitialized)
                 return;
             haveInitialized = true;
-
-            int i = 0;
-//            foreach (var device in InputManager.Devices)
-//            {
-//                
-//                if (device != null)
-//                {
-//                    inControlDevices[i] = device;
-//                    i++;
-//                }
-//            }
-
         }
-
-        
 
         static void GetKeyboard1Input(InputState inputState)
         {
@@ -178,6 +163,7 @@ namespace FreeLives
             inputState.aButton = Input.GetKey(kb1A);
             inputState.bButton = Input.GetKey(kb1B);
             inputState.start = Input.GetKey(kb1Start);
+            inputState.rightShoulder = Input.GetKey(kb1ShoulderRight);
         }
 
         static void GetKeyboard2Input(InputState inputState)
@@ -210,17 +196,13 @@ namespace FreeLives
             inputState.aButton = Input.GetKey(kb2A);
             inputState.bButton = Input.GetKey(kb2B);
             inputState.start = Input.GetKey(kb2Start);
+            inputState.rightShoulder = Input.GetKey(kb2ShoulderRight);
         }
-
-
 
         static void GetGamepadInput(UnityEngine.InputSystem.Gamepad device, InputState inputState)
         {
             if (device == null)
                 return;
-//            inputState.xAxis = device.LeftStickX;
-//            inputState.yAxis = device.LeftStickY;
-
 
             inputState.right = (device.leftStick.ReadValue().x > deadZone) || device.dpad.right.isPressed;
             inputState.left = (device.leftStick.ReadValue().x < -deadZone) || device.dpad.left.isPressed;
@@ -235,10 +217,8 @@ namespace FreeLives
             inputState.leftTrigger = device.leftTrigger.ReadValue();
             inputState.rightTrigger = device.rightTrigger.ReadValue();
             inputState.start = device.startButton.isPressed;
-
+            inputState.rightShoulder = device.rightShoulder.isPressed;
         }
-
-        
 
         public static void ClearInputState(InputState inputState)
         {
@@ -246,8 +226,6 @@ namespace FreeLives
             inputState.left = inputState.right = inputState.up = inputState.down = inputState.aButton = inputState.bButton = inputState.xButton = inputState.yButton = false;
         }
 
-
-       
         static bool GamepadHasBeenAssigned(Device device)
         {
             int index = 0;
@@ -271,13 +249,6 @@ namespace FreeLives
             }
 
             return UnityEngine.InputSystem.Gamepad.all.Count > index;
-//            return inControlDevices[index] != null;
-//            return false;
-
         }
-
-       
-
-
     }
 }
