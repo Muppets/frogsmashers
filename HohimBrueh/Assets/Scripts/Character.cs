@@ -145,7 +145,7 @@ public class Character : MonoBehaviour
     public float t { get; protected set; }
 
     float skidRecoverTimeLeft;
-    float shockRecoverTimeLeft;
+
     [HideInInspector]
     public Vector2 velocity, velocityT;
 
@@ -253,6 +253,9 @@ public class Character : MonoBehaviour
     public float poisonMultiplier;
     float poisonTimeLeft;
     bool isPoisoned;
+    float shockRecoverTimeLeft;
+    float frostedRecoverTimeLeft;
+    float frostedOriginalMaxRunSpeed;
 
     void Start()
     {
@@ -1039,6 +1042,15 @@ public class Character : MonoBehaviour
                         state = CharacterState.Shocked;
                         shockRecoverTimeLeft = 2f;
                     }
+                    else if (lastHitTongueType == TongueType.Frost)
+                    {
+                        frostedRecoverTimeLeft = 10f;
+                        if (frostedOriginalMaxRunSpeed == 0)
+                        {
+                            frostedOriginalMaxRunSpeed = maxRunSpeed;
+                            maxRunSpeed /= 2;
+                        }
+                    }
                     
                     lastHitTongueType = null;
                 }
@@ -1109,6 +1121,17 @@ public class Character : MonoBehaviour
         }
 
         jumpCooldownLeft -= t;
+        
+        if (frostedOriginalMaxRunSpeed > 0)
+        {
+            frostedRecoverTimeLeft -= t;
+            if (frostedRecoverTimeLeft <= 0f)
+            {
+                maxRunSpeed = frostedOriginalMaxRunSpeed;
+                frostedRecoverTimeLeft = 0;
+                frostedOriginalMaxRunSpeed = 0;
+            }
+        }
 
         if (state == CharacterState.Tounge)
         {
