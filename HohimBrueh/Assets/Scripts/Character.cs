@@ -45,7 +45,7 @@ public class Character : MonoBehaviour
     public Player player;
     [HideInInspector]
     public Player lastHitByPlayer;
-    public TongueType lastHitTongueType;
+    public TongueType? lastHitTongueType;
 
     public CharacterState state;
     public AttackState attackState;
@@ -1022,6 +1022,8 @@ public class Character : MonoBehaviour
                         state = CharacterState.Shocked;
                         shockRecoverTimeLeft = 2f;
                     }
+                    
+                    lastHitTongueType = null;
                 }
             }
         }
