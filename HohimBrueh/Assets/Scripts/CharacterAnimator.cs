@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class CharacterAnimator : MonoBehaviour
 {
@@ -119,6 +120,7 @@ public class CharacterAnimator : MonoBehaviour
 
     public CharacterSkinManager skinManager;
 
+    public SimpleAnim tongueTipAnim;
     public AudioSource flightAudioSource;
     public float flightHeightPitchMod;
     public bool modFlightVolume;
@@ -276,6 +278,7 @@ public class CharacterAnimator : MonoBehaviour
     public void ChangeTongueType(TongueType type) 
     {
         tongueLine.material.mainTexture = skinManager.getLineSkinFor(type);
+        tongueTipAnim.frames = skinManager.getTongueTipsFor(type).ToArray();
     }
     void AnimateIdle()
     {

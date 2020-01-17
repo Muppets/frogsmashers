@@ -48,7 +48,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 84b9e1d19d11078d11005b9844295342, type: 2}
+  - {fileID: 2100000, guid: f91fb2fa35a63a74485cb62ee3769b39, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -379,6 +379,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 0e9a072686775164d8de9c00c1e8acab, type: 3}
   - {fileID: 8300000, guid: 6672e4d2c85759942bd49e15a1ecc2b5, type: 3}
   skinManager: {fileID: 0}
+  tongueTipAnim: {fileID: 114101597350802170}
   flightAudioSource: {fileID: 82021346894502724}
   flightHeightPitchMod: 0.055555556
   modFlightVolume: 1

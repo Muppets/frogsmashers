@@ -5,7 +5,8 @@ using UnityEngine;
 public class TongueSkin : MonoBehaviour
 {
     public TongueType type;
-    public Texture  texture;
+    public Texture  lineTexture;
+    public List<Sprite> tipTextures;
 
     // Start is called before the first frame update
     void Start()

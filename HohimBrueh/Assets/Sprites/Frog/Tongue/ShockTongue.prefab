@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3405654777032474915}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.0030058401}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -44,4 +44,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 3
-  texture: {fileID: 2800000, guid: a0775b0d7cd524429a170c3b077eac84, type: 3}
+  lineTexture: {fileID: 2800000, guid: a0775b0d7cd524429a170c3b077eac84, type: 3}
+  tipTextures:
+  - {fileID: 21300000, guid: 9d1206eefeb9d432e9eeb44bbad95a07, type: 3}
+  - {fileID: 21300000, guid: 67e7518690f9d4e5b96b9ea0fb03c906, type: 3}
+  - {fileID: 21300000, guid: a5e27439e93bd4482a9d6bee0123a036, type: 3}
+  - {fileID: 21300000, guid: 9d55057826ff240eeb01e2df9e4c2f49, type: 3}
