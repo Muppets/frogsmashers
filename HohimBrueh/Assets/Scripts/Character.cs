@@ -257,6 +257,8 @@ public class Character : MonoBehaviour
     float frostedRecoverTimeLeft;
     float frostedOriginalMaxRunSpeed;
 
+    public bool IsFrosted => frostedOriginalMaxRunSpeed > 0;
+
     void Start()
     {
         CheckInput();
