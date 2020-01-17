@@ -897,14 +897,15 @@ public class Character : MonoBehaviour
         state = CharacterState.Bouncing;
         attackState = AttackState.Idle;
 
-        if (isPoisoned) {
-            power *= poisonMultiplier;
-        }
 
         if (hitDir.y == 0)
             hitDir.y = 0.33f;
         hitDir.Normalize();
-        totalPower = 10f + hitsTaken * 10f + power * 30f;
+        if (isPoisoned) {
+            totalPower = (10f + hitsTaken * 10f + power * 30f) * poisonMultiplier;
+        } else {
+            totalPower = 10f + hitsTaken * 10f + power * 30f;
+        }
 
         skidRecoverTimeLeft = 0.5f;
         velocity = hitDir.normalized * totalPower;
@@ -1614,7 +1615,7 @@ public class Character : MonoBehaviour
         
         var text = String.Format("{0}%", (int) totalPower);
         if (isPoisoned) {
-            text += " (x1.5)";
+            text += String.Format(" (x{0:F1})", poisonMultiplier);
         }
 
         textComponent.text = text;
