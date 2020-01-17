@@ -9,7 +9,8 @@ public enum CharacterState
     Normal,
     Attacking,
     Bouncing,
-    Tounge
+    Tounge,
+    Shocked
 }
 public enum AttackState
 {
@@ -44,6 +45,7 @@ public class Character : MonoBehaviour
     public Player player;
     [HideInInspector]
     public Player lastHitByPlayer;
+    public TongueType lastHitTongueType;
 
     public CharacterState state;
     public AttackState attackState;
@@ -99,6 +101,7 @@ public class Character : MonoBehaviour
     public float gravityGraceTimeLeft;
     public float attackTime;
     public float attackRecoverTime;
+    private CharacterAnimator characterAnimator;
 
     internal void TimeBump(float durationM, float scale)
     {
@@ -142,6 +145,7 @@ public class Character : MonoBehaviour
     public float t { get; protected set; }
 
     float skidRecoverTimeLeft;
+    float shockRecoverTimeLeft;
     [HideInInspector]
     public Vector2 velocity, velocityT;
 
@@ -253,6 +257,7 @@ public class Character : MonoBehaviour
     void Start()
     {
         CheckInput();
+        characterAnimator = GetComponent<CharacterAnimator>();
     }
 
     // Use this for initialization
@@ -806,6 +811,7 @@ public class Character : MonoBehaviour
             wasHitDownwards = true;
         hasReachedApex = false;
         lastHitByPlayer = attacker.player;
+        lastHitTongueType = attacker.tongueType;
         canBounceDodge = false;
         hasBounceDodged = false;
         canBounceTongue = false;
@@ -1025,7 +1031,15 @@ public class Character : MonoBehaviour
             {
                 skidRecoverTimeLeft -= t;
                 if (skidRecoverTimeLeft <= 0f)
+                {
                     StopBouncing();
+                    
+                    if (lastHitTongueType == TongueType.Shock)
+                    {
+                        state = CharacterState.Shocked;
+                        shockRecoverTimeLeft = 2f;
+                    }
+                }
             }
         }
     }
@@ -1070,6 +1084,14 @@ public class Character : MonoBehaviour
                 RunPhysicsBouncing();
             else
                 RunPhysicsNormal();
+        }
+        else if (state == CharacterState.Shocked)
+        {
+            shockRecoverTimeLeft -= t;
+            if (shockRecoverTimeLeft <= 0f)
+            {
+                state = CharacterState.Normal;
+            }
         }
         else
         {
@@ -1582,6 +1604,8 @@ public class Character : MonoBehaviour
                 tongueType = TongueType.Normal;
             break;
         }
+
+        this.characterAnimator.ChangeTongueType(tongueType);
     }
 
     void UpdateDamageText()
