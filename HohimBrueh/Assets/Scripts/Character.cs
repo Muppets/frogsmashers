@@ -159,6 +159,7 @@ public class Character : MonoBehaviour
 
     [HideInInspector]
     public int hitsTaken;
+    float totalPower;
 
     public Fly ingestingFly { get; protected set; }
 
@@ -168,8 +169,6 @@ public class Character : MonoBehaviour
     public float attackTimeLeft;
     [HideInInspector]
     public float attackRecoverTimeLeft;
-
-
 
 
     public bool attackFullyCharged
@@ -249,6 +248,12 @@ public class Character : MonoBehaviour
         }
     }
 
+    [Header("Status Effects")]
+    public float poisonTime;
+    public float poisonMultiplier;
+    float poisonTimeLeft;
+    bool isPoisoned;
+
     void Start()
     {
         CheckInput();
@@ -263,6 +268,9 @@ public class Character : MonoBehaviour
         characterLayer = 1 << LayerMask.NameToLayer("Character");
         tongueLayer = 1 << LayerMask.NameToLayer("Tongue");
         flyLayer = 1 << LayerMask.NameToLayer("Fly");
+
+        // isPoisoned = true;
+        // poisonTimeLeft = poisonTime;
     }
 
     void CheckInput()
@@ -319,6 +327,8 @@ public class Character : MonoBehaviour
         RunPhysics();
         ClampMotion();
         ApplyMotionVector();
+        UpdatePoison();
+        UpdateDamageText();
         if (state == CharacterState.Attacking)
             RunAttack();
         else if (state == CharacterState.Tounge)
@@ -394,6 +404,7 @@ public class Character : MonoBehaviour
         }
     }
 
+    [Header("Other")]
     public Vector2 attackDir;
     private float jumpCooldownLeft;
 
@@ -810,7 +821,7 @@ public class Character : MonoBehaviour
         if (hitDir.y == 0)
             hitDir.y = 0.1f;
         hitDir.Normalize();
-        float totalPower = 25f;
+        totalPower = 25f;
 
         skidRecoverTimeLeft = 0.5f;
         velocity = hitDir.normalized * totalPower;
@@ -818,6 +829,12 @@ public class Character : MonoBehaviour
         SoundController.PlaySoundEffect("TongueCollide", 0.5f, transform.position);
         TimeBump(0.75f, 0f);
         attacker.TimeBump(0.5f, 0f);
+
+        if (attacker.tongueType == TongueType.Poison)
+        {
+            isPoisoned = true;
+            poisonTimeLeft = poisonTime;
+        }
     }
 
     public void GetHitByBouncingCharacter(Vector2 hitVelocity, Character bouncer, Player attackingPlayer)
@@ -847,7 +864,6 @@ public class Character : MonoBehaviour
 
         TimeBump(bouncer.hitsTaken, 0f);
         bouncer.TimeBump(bouncer.hitsTaken, 0f);
-        //EffectsController.CreateHitParticles(transform.position + Vector3.up * height * 0.5f, hitDir, totalPower,(int) (totalPower / 5f));
         SoundController.PlaySoundEffect("CharacterCollision", 0.5f, transform.position);
         TimeController.TimeBumpCharacters(transform.position, bouncer.hitsTaken, 15f, true);
         EffectsController.CreateLocalizedShake(transform.position + Vector3.up * height * 0.5f, velocity, velocity.magnitude, timeBumpTimeLeft);
@@ -880,13 +896,15 @@ public class Character : MonoBehaviour
         hasBounceTongued = false;
         state = CharacterState.Bouncing;
         attackState = AttackState.Idle;
+
+        if (tongueType == TongueType.Poison) {
+            power *= poisonMultiplier;
+        }
+
         if (hitDir.y == 0)
             hitDir.y = 0.33f;
         hitDir.Normalize();
-        float totalPower = 10f + hitsTaken * 10f + power * 30f;
-
-        UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
-        textComponent.text = String.Format("{0}%", (int)totalPower);
+        totalPower = 10f + hitsTaken * 10f + power * 30f;
 
         skidRecoverTimeLeft = 0.5f;
         velocity = hitDir.normalized * totalPower;
@@ -894,7 +912,6 @@ public class Character : MonoBehaviour
 
         TimeBump(hitsTaken + power, 0f);
         attacker.TimeBump(hitsTaken + power, 0f);
-        //EffectsController.CreateHitParticles(transform.position + Vector3.up * height * 0.5f, hitDir, totalPower,(int) (totalPower / 5f));
         SoundController.PlaySoundEffect("BatHit" + Mathf.Clamp(hitsTaken, 1, 5).ToString(), 0.5f, transform.position);
         SoundController.PlaySoundEffect("BatHitVoice" + Mathf.Clamp(hitsTaken, 1, 5).ToString(), 0.5f, transform.position);
         TimeController.TimeBumpCharacters(transform.position, hitsTaken + power, 15f, true);
@@ -1151,9 +1168,7 @@ public class Character : MonoBehaviour
         state = CharacterState.Normal;
         wasHitDownwards = false;
         hitsTaken = 0;
-
-        UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
-        textComponent.text = "0%";
+        totalPower = 0;
 
         lastHitByPlayer = null;
     }
@@ -1491,6 +1506,15 @@ public class Character : MonoBehaviour
 
     }
 
+    void UpdatePoison()
+    {
+        poisonTimeLeft -= t;
+        if (poisonTimeLeft < 0)
+        {
+            isPoisoned = false;
+        }
+    }
+
 
     Vector2 TongueTipPos
     {
@@ -1586,4 +1610,15 @@ public class Character : MonoBehaviour
         this.characterAnimator.ChangeTongueType(tongueType);
     }
 
+    void UpdateDamageText()
+    {
+        UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
+        
+        var text = String.Format("{0}%", (int) totalPower);
+        if (isPoisoned) {
+            text += " (x1.5)";
+        }
+
+        textComponent.text = text;
+    }
 }
