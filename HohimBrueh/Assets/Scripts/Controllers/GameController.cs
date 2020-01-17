@@ -32,7 +32,9 @@ public class GameController : MonoBehaviour
 
     public Character characterPrefab;
 
-    public Fly flyPrefab, activeFly;
+    public Fly flyPrefab; 
+    
+    public List<Fly> activeFlys;
 
     float flySpawnDelay;
 
@@ -251,21 +253,24 @@ public class GameController : MonoBehaviour
         }
         else if (state == GameState.Playing)
         {
-            if (activeFly == null && !isShowDown)
-            {
+            // if (activeFly == null && !isShowDown)
+            // {
                 if (flySpawnDelay > 0f)
                 {
                     flySpawnDelay -= Time.deltaTime;
                     if (flySpawnDelay <= 0f)
-                        activeFly = Instantiate(flyPrefab, Terrain.GetFlySpawnPoint(), Quaternion.identity);
+                    {
+                        var activeFly = Instantiate(flyPrefab, Terrain.GetFlySpawnPoint(), Quaternion.identity);
+                        activeFlys.Add(activeFly);
+                    }
                 }
                 else
                 {
-                    flySpawnDelay = Random.Range(15f, 45f);
+                    flySpawnDelay = 5f; // Random.Range(15f, 45f);
                 }
 
 
-            }
+            // }
 
 
             for (int i = 0; i < activePlayers.Count; i++)

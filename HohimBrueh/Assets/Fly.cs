@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum FlyType
+{
+    Normal,
+    Poison,
+    Frost,
+    Shock
+}
+
 public class Fly : MonoBehaviour
 {
     Vector2 velocity, targetVelocity;
@@ -13,11 +21,36 @@ public class Fly : MonoBehaviour
 
     float updateDirectionDelay;
 
+    public FlyType type;
+
     // Use this for initialization
     void Start()
     {
         terrainLayer = 1 << LayerMask.NameToLayer("Ground");
         velocity = Random.insideUnitCircle.normalized * 10f;
+        
+        var randomNumber = Random.Range(0.001f, 3.999f);
+        var types = new FlyType[] { FlyType.Normal, FlyType.Poison, FlyType.Frost, FlyType.Shock };
+        type = types[(int)randomNumber];
+
+        switch(type)
+        {
+            case FlyType.Normal:
+                sprite.color = Color.white;
+                break;
+
+            case FlyType.Poison:
+                sprite.color = Color.green;
+                break;
+
+            case FlyType.Frost:
+                sprite.color = Color.blue;
+                break;
+
+            case FlyType.Shock:
+                sprite.color = Color.yellow;
+                break;
+        }
     }
 
     // Update is called once per frame

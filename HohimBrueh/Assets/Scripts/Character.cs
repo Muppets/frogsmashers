@@ -45,7 +45,7 @@ public class Character : MonoBehaviour
     public Player player;
     [HideInInspector]
     public Player lastHitByPlayer;
-    public TongueType lastHitTongueType;
+    public TongueType? lastHitTongueType;
 
     public CharacterState state;
     public AttackState attackState;
@@ -145,7 +145,7 @@ public class Character : MonoBehaviour
     public float t { get; protected set; }
 
     float skidRecoverTimeLeft;
-    float shockRecoverTimeLeft;
+
     [HideInInspector]
     public Vector2 velocity, velocityT;
 
@@ -253,6 +253,9 @@ public class Character : MonoBehaviour
     public float poisonMultiplier;
     float poisonTimeLeft;
     bool isPoisoned;
+    float shockRecoverTimeLeft;
+    float frostedRecoverTimeLeft;
+    float frostedOriginalMaxRunSpeed;
 
     void Start()
     {
@@ -897,14 +900,15 @@ public class Character : MonoBehaviour
         state = CharacterState.Bouncing;
         attackState = AttackState.Idle;
 
-        if (isPoisoned) {
-            power *= poisonMultiplier;
-        }
 
         if (hitDir.y == 0)
             hitDir.y = 0.33f;
         hitDir.Normalize();
-        totalPower = 10f + hitsTaken * 10f + power * 30f;
+        if (isPoisoned) {
+            totalPower = (10f + hitsTaken * 10f + power * 30f) * poisonMultiplier;
+        } else {
+            totalPower = 10f + hitsTaken * 10f + power * 30f;
+        }
 
         skidRecoverTimeLeft = 0.5f;
         velocity = hitDir.normalized * totalPower;
@@ -1039,6 +1043,17 @@ public class Character : MonoBehaviour
                         state = CharacterState.Shocked;
                         shockRecoverTimeLeft = 2f;
                     }
+                    else if (lastHitTongueType == TongueType.Frost)
+                    {
+                        frostedRecoverTimeLeft = 10f;
+                        if (frostedOriginalMaxRunSpeed == 0)
+                        {
+                            frostedOriginalMaxRunSpeed = maxRunSpeed;
+                            maxRunSpeed /= 2;
+                        }
+                    }
+                    
+                    lastHitTongueType = null;
                 }
             }
         }
@@ -1107,6 +1122,17 @@ public class Character : MonoBehaviour
         }
 
         jumpCooldownLeft -= t;
+        
+        if (frostedOriginalMaxRunSpeed > 0)
+        {
+            frostedRecoverTimeLeft -= t;
+            if (frostedRecoverTimeLeft <= 0f)
+            {
+                maxRunSpeed = frostedOriginalMaxRunSpeed;
+                frostedRecoverTimeLeft = 0;
+                frostedOriginalMaxRunSpeed = 0;
+            }
+        }
 
         if (state == CharacterState.Tounge)
         {
@@ -1353,7 +1379,28 @@ public class Character : MonoBehaviour
                 {
                     tongueState = TongueState.RetractingHitFly;
                     ingestingFly = fly.GetComponent<Fly>();
-                    ingestingFly.BeingIngested = true;
+
+                    switch (ingestingFly.type) {
+                        case FlyType.Normal:
+                            ingestingFly.BeingIngested = true;
+                            break;
+
+                        case FlyType.Poison:
+                            IngestedFly = true;
+                            tongueType = TongueType.Poison;
+                            break;
+
+                        case FlyType.Frost:
+                            IngestedFly = true;
+                            tongueType = TongueType.Frost;
+                            break;
+
+                        case FlyType.Shock:
+                            IngestedFly = true;
+                            tongueType = TongueType.Shock;
+                            break;
+                    }
+                    this.characterAnimator.ChangeTongueType(tongueType);
                     SoundController.PlaySoundEffect("TongueCollideSurface", 0.5f, TongueTipPos);
                 }
             }
@@ -1614,7 +1661,7 @@ public class Character : MonoBehaviour
         
         var text = String.Format("{0}%", (int) totalPower);
         if (isPoisoned) {
-            text += " (x1.5)";
+            text += String.Format(" (x{0:F1})", poisonMultiplier);
         }
 
         textComponent.text = text;
