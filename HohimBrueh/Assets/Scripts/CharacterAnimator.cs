@@ -117,6 +117,8 @@ public class CharacterAnimator : MonoBehaviour
 
     public AudioClip[] flight;
 
+    public CharacterSkinManager skinManager;
+
     public AudioSource flightAudioSource;
     public float flightHeightPitchMod;
     public bool modFlightVolume;
@@ -158,6 +160,8 @@ public class CharacterAnimator : MonoBehaviour
             rend.color = character.player.color;
             spriteDefaultOffset = rend.transform.localPosition;
         }
+        skinManager = GetComponent<CharacterSkinManager>();
+        this.ChangeTongueType(TongueType.Normal);
     }
 
     // Update is called once per frame
@@ -269,6 +273,10 @@ public class CharacterAnimator : MonoBehaviour
     }
 
 
+    public void ChangeTongueType(TongueType type) 
+    {
+        tongueLine.material.mainTexture = skinManager.getLineSkinFor(type);
+    }
     void AnimateIdle()
     {
 

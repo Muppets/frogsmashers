@@ -97,6 +97,7 @@ public class Character : MonoBehaviour
     public float gravityGraceTimeLeft;
     public float attackTime;
     public float attackRecoverTime;
+    private CharacterAnimator characterAnimator;
 
     internal void TimeBump(float durationM, float scale)
     {
@@ -246,6 +247,7 @@ public class Character : MonoBehaviour
     void Start()
     {
         CheckInput();
+        characterAnimator = GetComponent<CharacterAnimator>();
     }
 
     // Use this for initialization
@@ -1550,6 +1552,8 @@ public class Character : MonoBehaviour
                 tongueType = TongueType.Normal;
             break;
         }
+
+        this.characterAnimator.ChangeTongueType(tongueType);
     }
 
 }
