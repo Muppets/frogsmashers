@@ -897,7 +897,7 @@ public class Character : MonoBehaviour
         state = CharacterState.Bouncing;
         attackState = AttackState.Idle;
 
-        if (tongueType == TongueType.Poison) {
+        if (isPoisoned) {
             power *= poisonMultiplier;
         }
 
