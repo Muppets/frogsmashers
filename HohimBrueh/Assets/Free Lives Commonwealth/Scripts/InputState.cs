@@ -6,8 +6,8 @@ namespace FreeLives
     {
         // rename these variables (use F2)
         public float xAxis, yAxis, leftTrigger, rightTrigger;
-        public bool aButton, bButton, xButton, yButton, up, down, left, right, start;
+        public bool aButton, bButton, xButton, yButton, up, down, left, right, start, rightShoulder;
 
-        public bool wasAButton, wasBButton, wasXButton, wasYButton, wasUp, wasDown, wasLeft, wasRight, wasStart;
+        public bool wasAButton, wasBButton, wasXButton, wasYButton, wasUp, wasDown, wasLeft, wasRight, wasStart, wasRightShoulder;
     }
 }
