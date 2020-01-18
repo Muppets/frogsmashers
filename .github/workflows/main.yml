@@ -8,25 +8,14 @@ env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
-  requestActivation:
-    name: Request activation ✔
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v1
-
-      # Activate Unity
-      - name: Unity - Activate
-        uses: webbertakken/unity-activate@v1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-
-  buildForWindows:
-    name: Build for StandaloneWindows64 🗗
+  buildUnity:
+    name: Build Unity
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: webbertakken/unity-activate@v1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
       - uses: webbertakken/unity-builder@v0.5
         with:
           projectPath: HohimBrueh
