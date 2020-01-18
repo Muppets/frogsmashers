@@ -8,6 +8,20 @@ env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
+  requestActivation:
+    name: Request activation ✔
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      # Activate Unity
+      - name: Unity - Activate
+        uses: webbertakken/unity-activate@v1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
   buildForWindows:
     name: Build for StandaloneWindows64 🗗
     runs-on: ubuntu-latest
