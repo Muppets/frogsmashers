@@ -8,18 +8,53 @@ env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
-  buildUnity:
-    name: Build Unity
+  requestActivation:
+    name: Request activation ✔
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: webbertakken/unity-activate@v1
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      # Activate Unity
+      - name: Unity - Activate
+        uses: webbertakken/unity-activate@v1
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+  testRunnerInEditMode:
+    name: Test in editmode 📝
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository (required to test local actions)
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      # Configure test runner
+      - name: Run tests
+        id: testRunner
+        uses: webbertakken/unity-test-runner@v1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_PROJECT_PATH: /HohimBrueh
+          TEST_MODE: editmode
+
+      # Upload artifact
+      - name: Expose as artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: Test results (edit mode)
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
+
+  buildForWindows:
+    name: Build for Windows 🗗
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
       - uses: webbertakken/unity-builder@v0.5
         with:
-          projectPath: HohimBrueh
-          unityVersion: 2019.2.17f1
+          projectPath: /HohimBrueh
+          unityVersion: 2019.2.11f1
           targetPlatform: StandaloneWindows64
       - uses: actions/upload-artifact@v1
         with:
