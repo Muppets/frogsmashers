@@ -67,3 +67,49 @@ jobs:
           args: Windows64.zip application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  buildForMac:
+    name: Build for OSX 🍏
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: webbertakken/unity-builder@v0.5
+        with:
+          projectPath: /HohimBrueh
+          unityVersion: 2019.2.11f1
+          targetPlatform: StandaloneOSX
+      - run: |
+          cd build/StandaloneOSX-2019.2.11f1
+          zip -r ../../OSX.zip *
+      - uses: actions/upload-artifact@v1
+        with:
+          name: OSX
+          path: build/StandaloneOSX-2019.2.11f1
+      - uses: JasonEtco/upload-to-release@master
+        with:
+          args: OSX.zip application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  buildForLinux:
+    name: Build for Linux 🐧
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: webbertakken/unity-builder@v0.5
+        with:
+          projectPath: /HohimBrueh
+          unityVersion: 2019.2.11f1
+          targetPlatform: StandaloneLinux64
+      - run: |
+          cd build/StandaloneLinux64-2019.2.11f1
+          zip -r ../../Linux.zip *
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Linux
+          path: build/StandaloneLinux64-2019.2.11f1
+      - uses: JasonEtco/upload-to-release@master
+        with:
+          args: Linux.zip application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
