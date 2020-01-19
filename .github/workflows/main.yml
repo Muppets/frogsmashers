@@ -56,15 +56,14 @@ jobs:
           projectPath: /HohimBrueh
           unityVersion: 2019.2.11f1
           targetPlatform: StandaloneWindows64
+      - run: cd /home/runner/work/frogsmashers/frogsmashers/build/StandaloneWindows64-2019.2.11f1
+      - run: ls
+      - run: mv StandaloneWindows64 StandaloneWindows64.exe
       - uses: actions/upload-artifact@v1
         with:
           name: Build
           path: build
-      - run: ls
-      - run: pwd
-      - run: cd Build
-      - run: ls
-      - run: zip -r Build.zip /home/runner/work/HohimBrueh/HohimBrueh/build
+      - run: zip -r Build.zip .
       - uses: JasonEtco/upload-to-release@master
         with:
           args: Build.zip application/zip
