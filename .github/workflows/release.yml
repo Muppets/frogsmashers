@@ -1,8 +1,8 @@
-name: CI
+name: Release
 
-on:   
-  pull_request: {}
-  push: { branches: [master] }
+on:
+  release:
+    types: [created]
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -59,11 +59,11 @@ jobs:
       - run: sudo mv build/StandaloneWindows64-2019.2.11f1/StandaloneWindows64 build/StandaloneWindows64-2019.2.11f1/StandaloneWindows64.exe
       - uses: actions/upload-artifact@v1
         with:
-          name: Build
+          name: Windows64
           path: build/StandaloneWindows64-2019.2.11f1
-      - run: zip -r Build.zip build/StandaloneWindows64-2019.2.11f1
+      - run: zip -r Windows64.zip build/StandaloneWindows64-2019.2.11f1
       - uses: JasonEtco/upload-to-release@master
         with:
-          args: Build.zip application/zip
+          args: Windows64.zip application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
