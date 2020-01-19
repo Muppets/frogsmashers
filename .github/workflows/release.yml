@@ -1,6 +1,8 @@
 name: Release
 
-on: release
+on:
+  release:
+    types: [published]
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
