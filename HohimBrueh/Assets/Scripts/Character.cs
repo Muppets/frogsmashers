@@ -250,8 +250,11 @@ public class Character : MonoBehaviour
 
     [Header("Status Effects")]
     public float poisonTime;
-    public float poisonMultiplier;
-    float poisonTimeLeft;
+    public float poisonTickTime;
+    bool shouldApplyPoisonTick;
+    float poisonTickRecoverTimeLeft;
+    float poisonRecoverTimeLeft; 
+    Character lastPoisonedByCharacter;
     bool isPoisoned;
     float shockRecoverTimeLeft;
     float frostedRecoverTimeLeft;
@@ -273,9 +276,6 @@ public class Character : MonoBehaviour
         characterLayer = 1 << LayerMask.NameToLayer("Character");
         tongueLayer = 1 << LayerMask.NameToLayer("Tongue");
         flyLayer = 1 << LayerMask.NameToLayer("Fly");
-
-        // isPoisoned = true;
-        // poisonTimeLeft = poisonTime;
     }
 
     void CheckInput()
@@ -838,7 +838,9 @@ public class Character : MonoBehaviour
         if (attacker.tongueType == TongueType.Poison)
         {
             isPoisoned = true;
-            poisonTimeLeft = poisonTime;
+            poisonRecoverTimeLeft = poisonTime;
+            poisonTickRecoverTimeLeft = poisonTickTime;
+            lastPoisonedByCharacter = attacker;
         }
     }
 
@@ -906,11 +908,7 @@ public class Character : MonoBehaviour
         if (hitDir.y == 0)
             hitDir.y = 0.33f;
         hitDir.Normalize();
-        if (isPoisoned) {
-            totalPower = (10f + hitsTaken * 10f + power * 30f) * poisonMultiplier;
-        } else {
-            totalPower = 10f + hitsTaken * 10f + power * 30f;
-        }
+        totalPower = 10f + hitsTaken * 10f + power * 30f;
 
         skidRecoverTimeLeft = 0.5f;
         velocity = hitDir.normalized * totalPower;
@@ -927,6 +925,28 @@ public class Character : MonoBehaviour
         {
             EffectsController.ShakeCamera(hitDir, hitsTaken * 0.75f);
         }
+    }
+
+    public void GetHitByPoison() 
+    {
+        var hitDir = Vector2.up;
+        hitDir.x = UnityEngine.Random.Range(-0.3f, 0.3f);
+        hitDir.Normalize();
+
+        velocity += hitDir * 30;
+
+        totalPower += 7.5f;
+
+        attackState = AttackState.Idle;
+
+        var power = 1f;
+        var hitsTaken = 1;
+        TimeBump(hitsTaken + power, 0f);
+        SoundController.PlaySoundEffect("BatHit" + Mathf.Clamp(hitsTaken, 1, 5).ToString(), 0.2f, transform.position);
+        SoundController.PlaySoundEffect("BatHitVoice" + Mathf.Clamp(hitsTaken, 1, 5).ToString(), 0.2f, transform.position);
+        TimeController.TimeBumpCharacters(transform.position, hitsTaken + power, 15f, true);
+        EffectsController.CreateLocalizedShake(transform.position + Vector3.up * height * 0.3f, velocity, velocity.magnitude, timeBumpTimeLeft);
+        EffectsController.CreateHitEffect(transform.position + Vector3.up * height * 0.3f, timeBumpTimeLeft, power >= 1f);
     }
 
     void ApplyMotionVector()
@@ -1388,17 +1408,14 @@ public class Character : MonoBehaviour
                             break;
 
                         case FlyType.Poison:
-                            IngestedFly = true;
                             tongueType = TongueType.Poison;
                             break;
 
                         case FlyType.Frost:
-                            IngestedFly = true;
                             tongueType = TongueType.Frost;
                             break;
 
                         case FlyType.Shock:
-                            IngestedFly = true;
                             tongueType = TongueType.Shock;
                             break;
                     }
@@ -1541,7 +1558,9 @@ public class Character : MonoBehaviour
                     SoundController.PlaySoundEffect("Burp", 0.5f, TongueTipPos);
                     tongueState = TongueState.HitFlyBurping;
                     tongueDelayLeft = 0.65f;
-                    IngestedFly = true;
+                    if (ingestingFly.type == FlyType.Normal) {
+                        IngestedFly = true;
+                    }
                     ingestingFly.gameObject.SetActive(false);
                 }
             }
@@ -1555,8 +1574,16 @@ public class Character : MonoBehaviour
 
     void UpdatePoison()
     {
-        poisonTimeLeft -= t;
-        if (poisonTimeLeft < 0)
+        poisonRecoverTimeLeft -= t;
+        poisonTickRecoverTimeLeft -= t;
+                
+        if (isPoisoned && poisonTickRecoverTimeLeft < 0)
+        {
+            GetHitByPoison();
+            poisonTickRecoverTimeLeft = poisonTickTime;
+        }
+
+        if (poisonRecoverTimeLeft < 0)
         {
             isPoisoned = false;
         }
@@ -1662,10 +1689,6 @@ public class Character : MonoBehaviour
         UnityEngine.UI.Text textComponent = (UnityEngine.UI.Text)damageText.GetComponent("Text");
         
         var text = String.Format("{0}%", (int) totalPower);
-        if (isPoisoned) {
-            text += String.Format(" (x{0:F1})", poisonMultiplier);
-        }
-
         textComponent.text = text;
     }
 }

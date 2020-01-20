@@ -133,7 +133,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd7c92518b3ba6648a4692ae162b355b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lastHitTongueType: 0
   state: 0
   attackState: 0
   tongueType: 0
@@ -177,8 +176,9 @@ MonoBehaviour:
   hitsTaken: 0
   attackTimeLeft: 0
   attackRecoverTimeLeft: 0
-  poisonTime: 10
+  poisonTime: 15
   poisonMultiplier: 1.5
+  poisonTickTime: 2.5
   attackDir: {x: 0, y: 0}
 --- !u!61 &61092716579564996
 BoxCollider2D:
