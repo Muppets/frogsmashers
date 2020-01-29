@@ -49,6 +49,19 @@ namespace FreeLives
             }
         }
 
+    //NOTE: Use this when traversing menus
+        public static void GetKeyUp(InputState inputState)
+        {
+             if (UnityEngine.InputSystem.Gamepad.current != null)
+            {
+                GetGamepadInput(UnityEngine.InputSystem.Gamepad.current, inputState);
+            }
+            else
+            {
+                GetKeyboard1InputUp(inputState);
+            }
+        }
+
 
         public static void GetInput(Device device, InputState inputState)
         {
@@ -164,6 +177,39 @@ namespace FreeLives
             inputState.bButton = Input.GetKey(kb1B);
             inputState.start = Input.GetKey(kb1Start);
             inputState.rightShoulder = Input.GetKey(kb1ShoulderRight);
+        }
+
+        static void GetKeyboard1InputUp(InputState inputState)
+        {
+            inputState.xAxis = inputState.yAxis = inputState.leftTrigger = inputState.rightTrigger = 0f;
+            if (Input.GetKeyUp(kb1Left))
+            {
+                inputState.xAxis -= 1f;
+            }
+            if (Input.GetKeyUp(kb1Right))
+            {
+                inputState.xAxis += 1f;
+            }
+            if (Input.GetKeyUp(kb1Up))
+            {
+                inputState.yAxis += 1f;
+            }
+            if (Input.GetKeyUp(kb1Down))
+            {
+                inputState.yAxis -= 1f;
+            }
+
+            inputState.up = Input.GetKeyUp(kb1Up);
+            inputState.down = Input.GetKeyUp(kb1Down);
+            inputState.left = Input.GetKeyUp(kb1Left);
+            inputState.right = Input.GetKeyUp(kb1Right);
+
+            inputState.yButton = Input.GetKeyUp(kb1Y);
+            inputState.xButton = Input.GetKeyUp(kb1X);
+            inputState.aButton = Input.GetKeyUp(kb1A);
+            inputState.bButton = Input.GetKeyUp(kb1B);
+            inputState.start = Input.GetKeyUp(kb1Start);
+            inputState.rightShoulder = Input.GetKeyUp(kb1ShoulderRight);
         }
 
         static void GetKeyboard2Input(InputState inputState)

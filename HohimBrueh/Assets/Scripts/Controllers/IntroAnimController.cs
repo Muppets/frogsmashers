@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using FreeLives;
+
+public enum IntroState {
+     IntroAnimController,
+     StartOptions,
+     LevelSelect
+}
 public class IntroAnimController : MonoBehaviour
 {
 
@@ -17,9 +23,14 @@ public class IntroAnimController : MonoBehaviour
     public SoundHolder soundHolder;
 
     public float panTo;
+    public float panToRight;
     public float panTime;
     public AnimationCurve cameraPosCurve;
     float cameraPosM;
+
+    public IntroState state = IntroState.IntroAnimController;
+
+    public GameSelectInterface gameSelect;
 
     public Animator animator;
 
@@ -67,33 +78,56 @@ public class IntroAnimController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (cameraPanning && (cameraPanDelay -= Time.deltaTime) < 0f)
+        if (cameraPanning && (cameraPanDelay -= Time.deltaTime) < 0f && state == IntroState.IntroAnimController)
         {
             var p = Camera.main.transform.position;
             cameraPosM += 1 / panTime * Time.deltaTime;
             cameraPosM = Mathf.Clamp01(cameraPosM);
             p.y = cameraPosCurve.Evaluate(cameraPosM) * panTo;
             Camera.main.transform.position = p;
+            state = IntroState.StartOptions;
+            cameraPanning = false;
+        } else if (cameraPanning && (cameraPanDelay -= Time.deltaTime) < 0f && state == IntroState.StartOptions)
+        {
+             var p = Camera.main.transform.position;
+            cameraPosM += 1 / panTime * Time.deltaTime;
+            cameraPosM = Mathf.Clamp01(cameraPosM);
+            p.x = cameraPosCurve.Evaluate(cameraPosM) * panToRight;
+            Camera.main.transform.position = p;
+            state = IntroState.LevelSelect;
         }
 
-        InputReader.GetInput(input);
-        if (cameraPosM == 1f)
+        InputReader.GetKeyUp(input);
+       
+       if (state == IntroState.IntroAnimController)
         {
             if (input.start && !input.wasStart)
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("JoinScreen");
-            }
-        }
-        else
-        {
-            if (input.start && !input.wasStart)
-            {
-                animator.CrossFade(animator.GetCurrentAnimatorStateInfo(-1).shortNameHash, 0f, 0, 0.95f);
+                //animator.CrossFade(animator.GetCurrentAnimatorStateInfo(-1).shortNameHash, 0f, 0, 0.95f);
                 cameraPanning = true;
                 cameraPanDelay = 0f;
                 cameraPosM = 1f;
             }
+        } else if (state == IntroState.StartOptions)
+        {
+            if (input.start && !input.wasStart)
+            {
+                //animator.CrossFade(animator.GetCurrentAnimatorStateInfo(-1).shortNameHash, 0f, 0, 0.95f);
+
+                cameraPanning = true;
+                cameraPanDelay = 0f;
+                cameraPosM = 1f;
+            }
+
+            if (input.start && !input.wasStart)
+            {
+                //UnityEngine.SceneManagement.SceneManager.LoadScene("JoinScreen");
+            }
         }
+        else {
+            gameSelect.sendInput(input);
+        }
+
         if (cameraPosM > 0.55f)
         {
             shakeDelay -= Time.deltaTime;
