@@ -62,7 +62,17 @@ jobs:
     name: Build for OSX 🍏
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      
+      - name: Cache library
+        uses: actions/cache@v1.1.0
+        with:
+          path: Library
+          key: Library
+      
       - uses: webbertakken/unity-builder@v0.11
         with:
           projectPath: /HohimBrueh
