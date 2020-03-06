@@ -27,11 +27,6 @@ jobs:
           path: Library
           key: Library
       
-      - name: Run tests
-        uses: webbertakken/unity-test-runner@v1.5
-        with:
-          unityVersion: 2019.3.0f1
-
       - name: Build project
         uses: webbertakken/unity-builder@v0.11
         with:
@@ -41,6 +36,9 @@ jobs:
 
       - name: Zip up output
         run: |
+          cd build
+          ls
+          cd StandaloneWindows64-2019.3.0f1
           cd build/StandaloneWindows64-2019.3.0f1
           sudo mv StandaloneWindows64 StandaloneWindows64.exe
           zip -r ../../Windows64.zip *
@@ -78,14 +76,22 @@ jobs:
           projectPath: /HohimBrueh
           unityVersion: 2019.3.0f1
           targetPlatform: StandaloneOSX
-      - run: |
-          cd build/StandaloneOSX-2019.3.0f1
+
+      - name: Zip up output
+        run: |
+          cd build
+          ls
+          cd StandaloneOSX-2019.3.0f1
           zip -r ../../OSX.zip *
-      - uses: actions/upload-artifact@v1
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
         with:
           name: OSX
           path: build/StandaloneOSX-2019.3.0f1
-      - uses: JasonEtco/upload-to-release@master
+
+      - name: Attach to release
+        uses: JasonEtco/upload-to-release@master
         with:
           args: OSX.zip application/zip
         env:
@@ -95,19 +101,32 @@ jobs:
     name: Build for Linux 🐧
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      
+      - name: Cache library
+        uses: actions/cache@v1.1.0
+        with:
+          path: Library
+          key: Library
+      
       - uses: webbertakken/unity-builder@v0.11
         with:
           projectPath: /HohimBrueh
           unityVersion: 2019.3.0f1
           targetPlatform: StandaloneLinux64
+
       - run: |
           cd build/StandaloneLinux64-2019.3.0f1
           zip -r ../../Linux.zip *
+
       - uses: actions/upload-artifact@v1
         with:
           name: Linux
           path: build/StandaloneLinux64-2019.3.0f1
+
       - uses: JasonEtco/upload-to-release@master
         with:
           args: Linux.zip application/zip
