@@ -3,6 +3,9 @@ name: Release
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - master
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
