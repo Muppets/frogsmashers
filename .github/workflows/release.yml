@@ -36,10 +36,7 @@ jobs:
 
       - name: Zip up output
         run: |
-          cd build
-          ls
-          cd StandaloneWindows64-2019.3.0f1
-          cd build/StandaloneWindows64-2019.3.0f1
+          cd build/StandaloneWindows64
           sudo mv StandaloneWindows64 StandaloneWindows64.exe
           zip -r ../../Windows64.zip *
 
@@ -47,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: Windows64
-          path: build/StandaloneWindows64-2019.3.0f1
+          path: build/StandaloneWindows64
 
       - name: Attach to release
         uses: JasonEtco/upload-to-release@master
@@ -71,7 +68,8 @@ jobs:
           path: Library
           key: Library
       
-      - uses: webbertakken/unity-builder@v0.11
+      - name: Build project
+        uses: webbertakken/unity-builder@v0.11
         with:
           projectPath: /HohimBrueh
           unityVersion: 2019.3.0f1
@@ -79,16 +77,14 @@ jobs:
 
       - name: Zip up output
         run: |
-          cd build
-          ls
-          cd StandaloneOSX-2019.3.0f1
+          cd build/StandaloneOSX
           zip -r ../../OSX.zip *
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
         with:
           name: OSX
-          path: build/StandaloneOSX-2019.3.0f1
+          path: build/StandaloneOSX
 
       - name: Attach to release
         uses: JasonEtco/upload-to-release@master
@@ -112,22 +108,26 @@ jobs:
           path: Library
           key: Library
       
-      - uses: webbertakken/unity-builder@v0.11
+      - name: Build project
+        uses: webbertakken/unity-builder@v0.11
         with:
           projectPath: /HohimBrueh
           unityVersion: 2019.3.0f1
           targetPlatform: StandaloneLinux64
 
-      - run: |
-          cd build/StandaloneLinux64-2019.3.0f1
+      - name: Zip up output
+        run: |
+          cd build/StandaloneLinux
           zip -r ../../Linux.zip *
 
-      - uses: actions/upload-artifact@v1
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
         with:
           name: Linux
           path: build/StandaloneLinux64-2019.3.0f1
 
-      - uses: JasonEtco/upload-to-release@master
+      - name: Attach to release
+        uses: JasonEtco/upload-to-release@master
         with:
           args: Linux.zip application/zip
         env:
